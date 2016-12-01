@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var log = require('./libs/log')(module);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -27,9 +28,12 @@ app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+  res.status(404);
+  log.debug('%s %d %s', req.method, res.statusCode, req.url);
+  res.json({ 
+    error: 'Not found' 
+  });
+  return;
 });
 
 // error handler
@@ -38,9 +42,12 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  log.error('%s %d %s', req.method, res.statusCode, err.message);
+  res.json({ 
+    error: err.message 
+  });
+  return;
 });
 
 module.exports = app;

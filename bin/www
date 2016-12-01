@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('nodeapi:server');
 var http = require('http');
-
+var log = require('../libs/log')(module);
 /**
  * Get port from environment and store in Express.
  */
@@ -87,4 +87,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  log.info('Server listening on ' + bind);
 }
