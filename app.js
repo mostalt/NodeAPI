@@ -4,9 +4,18 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var log = require('./libs/log')(module);
+var passport = require('passport');
 
-var index = require('./routes/index');
+var libs = process.cwd() + '/libs/';
+require(libs + 'auth/auth');
+
+var config = require(libs + 'config');
+var oauth2 = require(libs + 'auth/oauth2');
+var log = require(libs + 'log')(module);
+
 var articles = require('./routes/articles');
+var users = require('./routes/users');
+var api = require('./routes/api');
 
 var app = express();
 
@@ -14,10 +23,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
 
-app.use(index);
-app.use(articles);
+
+app.use('/', api);
+app.use('/api', api);
+app.use('/api/users', users);
+app.use('/api/articles', articles);
+app.use('/api/oauth/token', oauth2.token);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
