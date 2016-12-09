@@ -2,6 +2,8 @@ var mongoose = require('mongoose');
 var log = require('./log')(module);
 var config = require('./config');
 
+mongoose.Promise = global.Promise;
+
 mongoose.connect(config.get('mongoose:uri'));
 
 var db = mongoose.connection;

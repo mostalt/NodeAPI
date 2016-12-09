@@ -16,6 +16,7 @@ var log = require(libs + 'log')(module);
 var articles = require('./routes/articles');
 var users = require('./routes/users');
 var api = require('./routes/api');
+var auth = require('./routes/oauth');
 
 var app = express();
 
@@ -26,11 +27,11 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 
-app.use('/', api);
-app.use('/api', api);
-app.use('/api/users', users);
-app.use('/api/articles', articles);
+app.use(api);
+app.use(users);
+app.use(articles);
 app.use('/api/oauth/token', oauth2.token);
+app.use(auth);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
