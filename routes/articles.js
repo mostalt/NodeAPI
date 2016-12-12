@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var passport = require('passport');
 
 var libs = process.cwd() + '/libs/';
 var log = require(libs + 'log')(module);
@@ -7,7 +8,9 @@ var db = require(libs + 'mongoose');
 
 var Article = require('../models/article');
 
-router.get('/api/articles', function (req, res) {
+router.get('/', passport.authenticate('bearer', {
+  session: false
+}), function (req, res) {
 
   Article.find(function (err, articles) {
     if (!err) {
@@ -25,7 +28,9 @@ router.get('/api/articles', function (req, res) {
 
 });
 
-router.post('/api/articles', function (req, res) {
+router.post('/', passport.authenticate('bearer', {
+  session: false
+}), function (req, res) {
 
   var article = new Article({
     title: req.body.title,
@@ -36,13 +41,12 @@ router.post('/api/articles', function (req, res) {
 
   article.save(function (err) {
     if (!err) {
-      log.info("article created");
+      log.info("New article created with id: %s", article.id);
       return res.send({
         status: 'OK',
         article: article
       });
     } else {
-      console.log(err);
       if (err.name == 'ValidationError') {
         res.statusCode = 400;
         res.send({
@@ -60,7 +64,9 @@ router.post('/api/articles', function (req, res) {
 
 });
 
-router.get('/api/articles/:id', function (req, res) {
+router.get('/api/articles/:id', passport.authenticate('bearer', {
+  session: false
+}), function (req, res) {
 
   Article.findById(req.params.id, function (err, article) {
 
@@ -89,7 +95,9 @@ router.get('/api/articles/:id', function (req, res) {
 
 });
 
-router.put('/api/articles/:id', function (req, res) {
+router.put('/:id', passport.authenticate('bearer', {
+  session: false
+}), function (req, res) {
 
   Article.findById(req.params.id, function (err, article) {
     if (!article) {
@@ -120,19 +128,21 @@ router.put('/api/articles/:id', function (req, res) {
           });
         } else {
           res.statusCode = 500;
+          log.error('Internal error (%d): %s', res.statusCode, err.message);
 
           return res.json({
             error: 'Server error'
           });
-        }
-        log.error('Internal error (%d): %s', res.statusCode, err.message);
+        }ß
       }
     });
   });
 
 });
 
-router.delete('/api/articles/:id', function (req, res) {
+router.delete('/:id', passport.authenticate('bearer', {
+  session: false
+}), function (req, res) {
 
   Article.findById(req.params.id, function (err, article) {
     if (!article) {
